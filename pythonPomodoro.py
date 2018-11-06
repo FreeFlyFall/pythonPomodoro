@@ -31,7 +31,7 @@ def time_up(isWorking, breakTime, workTime):
         counter = breakTime
     # Else, the user is not working
     else:
-        # Set te variables for the work state
+        # Set the variables for the work state
         msg = 'Get back to work!'
         soundName = 'WorkSound'
         counter = workTime
