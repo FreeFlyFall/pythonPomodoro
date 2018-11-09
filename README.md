@@ -1,3 +1,4 @@
 # pythonPomodoro
 
-Simple command line pomodoro timer that requires little user input.
+Simple pomodoro timer that requires little user input.
+* 2 versions - command line and tkinter GUI
