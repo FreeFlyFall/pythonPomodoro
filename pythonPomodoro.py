@@ -1,17 +1,15 @@
-## Pomodoro Timer ##
 import tkinter
 import winsound
 import time
 import os
+'''
+Pomodoro timer created to require little user interaction
+'''
 
-##Pomodoro timer created to require little user interaction
-
-# To-do:
-# Create GUI with tkinter
-
-# Define function passed the type of time to be set
+# -- FUNCTIONS -------
+# Define function passed the type of time that sets the time
 def set_time(timeType):
-    # Loop trying to return input
+    # Loop to return input
     while True:
         try:
             # Get integer input from user for the specific time type
@@ -21,38 +19,31 @@ def set_time(timeType):
             print('Invalid input')
             continue
 
-# Define function passed state and times
-def time_up(isWorking, breakTime, workTime):
+# Define function passed state and times that returns data
+def change_state():
     # If the user is working
     if isWorking == True:
-        # Set variables for the break state
-        msg = 'Take a break!'
-        soundName = 'BreakSound'
-        counter = breakTime
+        # Set & return the variables for the break state
+        return 'Take a break!', 'BreakSound', breakTime, False
     # Else, the user is not working
     else:
-        # Set te variables for the work state
-        msg = 'Get back to work!'
-        soundName = 'WorkSound'
-        counter = workTime
-    # Invert the state
-    isWorking = not isWorking
-    # Create a data tuple and return it
-    returnData = (msg, soundName, counter, isWorking)
-    return returnData
+        # Set & return the variables for the work state
+        return 'Get back to work!', 'WorkSound', workTime, True
 
-# Tell the user how to exit the program during operation
-print('Press Ctrl+C if you want to exit during the countdown.')
-
-# Set work and break times using the set_time() function
+# -- PROGRAM START -------
+global isWorking
+global workTime
+global breakTime
+print('Press Ctrl+C to exit during the countdown.')
+# Get and set both the work and break times using the set_time() function
 workTime = set_time("work")
 breakTime = set_time("break")
 # Create counter variable to track time and initialize it to be the value of workTime
 counter = workTime
-# Initialize boolean for state
+# Initialize boolean for state that tells whether the user is working
 isWorking = True
 
-# Loop to run countdown and inform user
+# Loop to repeatedly run countdown and inform user
 while True:
     # If the countdown is running
     if counter > 0:
@@ -60,17 +51,16 @@ while True:
         print(counter)
         time.sleep(1)
         counter -= 1
-
     # Else if the counter is done
     elif (counter <= 0):
-        # Get data tuple from time_up() function
-        data = time_up(isWorking, breakTime, workTime)
-        # Using the data indices which were set according to the state, print the message,
+        # Get data sequence from change_state() function and set the varibles
+        notification, sound, passedTime, booleanState = change_state()
+        # Using the variables which were set according to the state, print the message,
         # play the sound, set the counter, and set the state
-        print(data[0])
+        print(notification)
         # Sound options for different operating systems (Wav files only)
-        # os.system("aplay sound.wav&") # Linux
-        # os.system("afplay sound.wav&") # Mac
-        winsound.PlaySound(data[1], winsound.SND_ASYNC) #windows
-        counter = data[2]
-        isWorking = data[3]
+            # os.system("aplay sound.wav&") # Linux
+            # os.system("afplay sound.wav&") # Mac
+        winsound.PlaySound(sound, winsound.SND_ASYNC) #windows
+        counter = passedTime
+        isWorking = booleanState
