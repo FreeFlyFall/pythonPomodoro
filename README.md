@@ -1,6 +1,8 @@
 # pythonPomodoro
 
 Simple pomodoro timer that requires little user input.
-* 2 versions - command line and tkinter GUI
 
-https://www.youtube.com/watch?v=_ziBvOLeVGQ
+3 versions:
+- Command line interface
+- Tkinter GUI with seconds input
+- Tkinter GUI with hour, minutes, seconds input
