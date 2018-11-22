@@ -8,7 +8,6 @@ import os
 Pomodoro timer created to require little user interaction
 and remove the need to have a browser open
 '''
-# account for input of over 60
 # Class for the display counter label
 class displayCounter():
     # Initialize data for the class
