@@ -50,7 +50,6 @@ class displayCounter():
                         # os.system("afplay sound.wav&") # Mac
                     winsound.PlaySound(self.textNotifData[1], winsound.SND_ASYNC) #windows
                     self.isWorking = self.textNotifData[2]
-                                #sets to the self variables every tick so they never change, FIX THIS!
                     if(self.isWorking):
                         timeHours, timeMinutes, timeSeconds = self.workHours, self.workMinutes, self.workSeconds
                     else:
