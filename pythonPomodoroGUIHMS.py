@@ -8,81 +8,62 @@ import os
 Pomodoro timer created to require little user interaction
 and remove the need to have a browser open
 '''
-# account for input of over 60
-# Class for the display counter label
+
+#Initial HMS variables
+timeHours, timeMinutes, timeSeconds = 0, 0, 0
+# Initial number of displayCounter instances
+instances = 0
+
+# displayCounter Object
 class displayCounter():
-    # Initialize data for the class
     def __init__(self, window):
         self.window=window
         self.notifLabel = tk.Label(text="")
         self.notifLabel.grid(column=2, row=3)
         self.workHours, self.workMinutes, self.workSeconds, self.breakHours, self.breakMinutes, self.breakSeconds = hmsdata
         self.isWorking = True
-        # Tuple for the initial display, [1] empty for compatibility
-        # with concatenation when reconfiguring notifLabel(text). I'm being lazy, I know.
-        self.data = ('Get to work!', '')
+        self.textNotifData = ('Get to work!', '')
+        global timeHours, timeMinutes, timeSeconds
+        timeHours, timeMinutes, timeSeconds = self.workHours, self.workMinutes, self.workSeconds
         self.tick()
 
-    #function called every second
+    # Called once per second
     def tick(self):
+        global timeHours, timeMinutes, timeSeconds
         try:
-            if(self.isWorking == True):
-                self.displayData = str(self.workHours) + ":" + str(self.workMinutes) + ":" + str(self.workSeconds)
-                print(self.workHours, self.workMinutes, self.workSeconds)
-                if (self.workHours >= 0 and self.workMinutes >= 0 and self.workSeconds >= 0):
-                    # Set and display the counter string and decrement the counter
-                    counterDisplayString = self.data[0] + " " + str(self.displayData)
-                    self.notifLabel.config(text=counterDisplayString)
-                    # If the counter is done
-                    if (self.workHours == 0 and self.workMinutes == 0 and self.workSeconds == 1):
-                        # Get data tuple from time_up() function
-                        self.data = self.time_up()
-                        # Using the data indices which were set in time_up(),
-                        # print the message, play the sound, set the counter, and set the isWorking boolean
-                        #(Use SND_FILENAME to pause counter while playing the sound)
-                        # # Sound options for different operating systems (only wav files are compatible with winsound)
-                            # os.system("aplay sound.wav&") # Linux
-                            # os.system("afplay sound.wav&") # Mac
-                        winsound.PlaySound(self.data[1], winsound.SND_ASYNC) #windows
-                        self.isWorking = self.data[2]
+            # if the countdown is running
+            if (timeHours >= 0 and timeMinutes >= 0 and timeSeconds >= 0):
+                # Set the HMS data to be displayed
+                self.timeDisplayData = str(timeHours) + ":" + str(timeMinutes) + ":" + str(timeSeconds)
+                # Set and display the  and decrement the counter
+                notifString = self.textNotifData[0] + " " + str(self.timeDisplayData)
+                self.notifLabel.config(text=notifString)
+                # If the counter is done
+                if (timeHours == 0 and timeMinutes == 0 and timeSeconds == 0):
+                    # Get data tuple from time_up() function
+                    self.textNotifData = self.time_up()
+                    # Using the data indices which were set in time_up(),
+                    # print the message, play the sound, set the counter, and set the isWorking boolean
+                    #(Use SND_FILENAME to pause counter while playing the sound)
+                    # # Sound options for different operating systems (only wav files are compatible with winsound)
+                        # os.system("aplay sound.wav&") # Linux
+                        # os.system("afplay sound.wav&") # Mac
+                    winsound.PlaySound(self.textNotifData[1], winsound.SND_ASYNC) #windows
+                    self.isWorking = self.textNotifData[2]
+                                #sets to the self variables every tick so they never change, FIX THIS!
+                    if(self.isWorking):
+                        timeHours, timeMinutes, timeSeconds = self.workHours, self.workMinutes, self.workSeconds
                     else:
-                        if(self.workSeconds > 0):
-                            self.workSeconds -= 1
-                        elif(self.workMinutes > 0):
-                            self.workMinutes -= 1
-                            self.workSeconds = 59
-                        elif(self.workHours > 0):
-                            self.workHours -= 1
-                            self.workMinutes = 59
-            else:
-                self.displayData = str(self.breakHours) + ":" + str(self.breakMinutes) + ":" + str(self.breakSeconds)
-                print(self.breakHours, self.breakMinutes, self.breakSeconds)
-                if (self.breakHours >= 0 and self.breakMinutes >= 0 and self.breakSeconds >= 0):
-                    # Set and display the counter string and decrement the counter
-                    counterDisplayString = self.data[0] + " " + str(self.displayData)
-                    self.notifLabel.config(text=counterDisplayString)
-                    # If the counter is done
-                    if (self.breakHours == 0 and self.breakMinutes == 0 and self.breakSeconds == 1):
-                        # Get data tuple from time_up() function
-                        self.data = self.time_up()
-                        # Using the data indices which were set in time_up(),
-                        # print the message, play the sound, set the counter, and set the isWorking boolean
-                        #(Use SND_FILENAME to pause counter while playing the sound)
-                        # # Sound options for different operating systems (only wav files are compatible with winsound)
-                            # os.system("aplay sound.wav&") # Linux
-                            # os.system("afplay sound.wav&") # Mac
-                        winsound.PlaySound(self.data[1], winsound.SND_ASYNC) #windows
-                        self.isWorking = self.data[2]
-                    else:
-                        if(self.breakSeconds > 0):
-                            self.breakSeconds -= 1
-                        elif(self.breakMinutes > 0):
-                            self.breakMinutes -= 1
-                            self.breakSeconds = 59
-                        elif(self.breakHours > 0):
-                            self.breakHours -= 1
-                            self.breakMinutes = 59
-
+                        timeHours, timeMinutes, timeSeconds = self.breakHours, self.breakMinutes, self.breakSeconds
+                else:
+                    if(timeSeconds > 0):
+                        timeSeconds -= 1
+                    elif(timeMinutes > 0):
+                        timeMinutes -= 1
+                        timeSeconds = 59
+                    elif(timeHours > 0):
+                        timeHours -= 1
+                        timeMinutes = 59
         # Print exception if it occurs
         except Exception as e: #ValueError:
             print(e)
@@ -108,8 +89,6 @@ class displayCounter():
         self.workHours, self.workMinutes, self.workSeconds, self.breakHours, self.breakMinutes, self.breakSeconds = hmsdata
         return returnData
 
-# number of displayCounter instances
-instances = 0
 # Function to instantiate the counter and allow the times to be set while limiting counter to 1 instance
 def instantiate_displayCounter():
     global instances
@@ -169,5 +148,3 @@ button1 = tk.Button(text="Start", font=("Times New Roman", 12), command=instanti
 button1.grid(column=0, row=3)
 # MAINLOOP
 window.mainloop()
-
-
