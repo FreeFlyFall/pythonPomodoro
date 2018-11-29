@@ -42,13 +42,19 @@ class displayCounter():
                 if (timeHours == 0 and timeMinutes == 0 and timeSeconds == 0):
                     # Get data tuple from time_up() function
                     self.textNotifData = self.time_up()
-                    # Using the data indices which were set in time_up(),
-                    # print the message, play the sound, set the counter, and set the isWorking boolean
-                    #(Use SND_FILENAME to pause counter while playing the sound)
-                    # # Sound options for different operating systems (only wav files are compatible with winsound)
-                        # os.system("aplay sound.wav&") # Linux
-                        # os.system("afplay sound.wav&") # Mac
-                    winsound.PlaySound(self.textNotifData[1], winsound.SND_ASYNC) #windows
+                    # Play sound asynchronously on windows
+                    try:
+                        winsound.PlaySound(self.textNotifData[1], winsound.SND_ASYNC)
+                    except Exception:
+                        # If error, try method for playing sound on linux
+                        try:
+                            os.system("aplay " + self.textNotifData[1] + ".wav&")
+                        except Exception:
+                            # If error, try method for playing sound on a Mac
+                            try:
+                                os.system("afplay " + self.textNotifData[1] + ".wav&")
+                            except Exception as e:
+                                print(e)
                     self.isWorking = self.textNotifData[2]
                     if(self.isWorking):
                         timeHours, timeMinutes, timeSeconds = self.workHours, self.workMinutes, self.workSeconds
