@@ -113,10 +113,10 @@ def instantiate_displayCounter():
 # SETUP WINDOW
 window = tk.Tk()
 window.title("Python Pomodoro")
-window.geometry("550x150")
+window.geometry("500x125")
 # LABEL
 headLabel = tk.Label(text="Pomodoro", font=("Times New Roman", 20))
-headLabel.grid(column=0, row=0)
+headLabel.grid(columnspan=7, row=0,)
 workTextLabel = tk.Label(text="Work length")
 workTextLabel.grid(column=0, row=1)
 breakTextLabel = tk.Label(text="Break length")
@@ -149,5 +149,7 @@ breakSecondsEntry.grid(column=6, row=2)
 # BUTTON
 button1 = tk.Button(text="Start", font=("Times New Roman", 12), command=instantiate_displayCounter)
 button1.grid(column=0, row=3)
+# Use a class with this method to fix the error from python sending self
+#button1.bind('<Return>', instantiate_displayCounter)
 # MAINLOOP
 window.mainloop()
