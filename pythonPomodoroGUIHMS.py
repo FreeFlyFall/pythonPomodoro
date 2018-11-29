@@ -55,7 +55,7 @@ class displayCounter():
                                 os.system("afplay " + self.textNotifData[1] + ".wav&")
                             except Exception as e:
                                 print(e)
-                    self.isWorking = self.textNotifData[2]
+                    self.isWorking = not self.isWorking
                     if(self.isWorking):
                         timeHours, timeMinutes, timeSeconds = self.workHours, self.workMinutes, self.workSeconds
                     else:
@@ -78,22 +78,13 @@ class displayCounter():
 
     # Set the state according to the isWorking boolean
     def time_up(self):
+        self.workHours, self.workMinutes, self.workSeconds, self.breakHours, self.breakMinutes, self.breakSeconds = hmsdata
         # If the user is working
         if self.isWorking == True:
-            # Set tuple values for the break state
-            msg = 'Take a break!'
-            soundName = 'BreakSound'
+            return ('Take a break!', 'BreakSound')
         # Else, the user is not working
         else:
-            # Set tuples values for the work state
-            msg = 'Get to work!'
-            soundName = 'WorkSound'
-        # Invert the isWorking boolean to be sent back in the tuple
-        isWorking = not self.isWorking
-        # Create tuple containing the data to be returned and return it
-        returnData = (msg, soundName, isWorking)
-        self.workHours, self.workMinutes, self.workSeconds, self.breakHours, self.breakMinutes, self.breakSeconds = hmsdata
-        return returnData
+            return('Get to work!', 'workSound')
 
 # Function to instantiate the counter and allow the times to be set while limiting counter to 1 instance
 def instantiate_displayCounter():
