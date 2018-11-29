@@ -35,7 +35,7 @@ class displayCounter():
             if (timeHours >= 0 and timeMinutes >= 0 and timeSeconds >= 0):
                 # Set the HMS data to be displayed
                 self.timeDisplayData = str(timeHours) + ":" + str(timeMinutes) + ":" + str(timeSeconds)
-                # Set and display the  and decrement the counter
+                # Set and display the data
                 notifString = self.textNotifData[0] + " " + str(self.timeDisplayData)
                 self.notifLabel.config(text=notifString)
                 # If the counter is done
@@ -63,6 +63,7 @@ class displayCounter():
                     elif(timeHours > 0):
                         timeHours -= 1
                         timeMinutes = 59
+                        timeSeconds = 59
         # Print exception if it occurs
         except Exception as e: #ValueError:
             print(e)
@@ -92,8 +93,14 @@ class displayCounter():
 def instantiate_displayCounter():
     global instances
     global hmsdata
-    hmsdata = [int(workHoursEntry.get()), int(workMinutesEntry.get()), int(workSecondsEntry.get()), int(breakHoursEntry.get()), int(breakMinutesEntry.get()), int(breakSecondsEntry.get())]
+    hmsdata = [workHoursEntry, workMinutesEntry, workSecondsEntry, breakHoursEntry, breakMinutesEntry, breakSecondsEntry]
     for i, data in enumerate(hmsdata):
+        try:
+            hmsdata[i] = int(hmsdata[i].get())
+        except ValueError:
+            hmsdata[i] = 0
+        except Exception as e:
+            print(e)
         if hmsdata[i] > 60:
             print("Input " + str(hmsdata[i]) + " > 60; flooring.")
             hmsdata[i] = 60
@@ -132,14 +139,14 @@ breakSecondsLabel.grid(column=5, row=2)
 # ENTRY
 workHoursEntry = tk.Entry()
 workHoursEntry.grid(column=2, row=1)
-breakHoursEntry = tk.Entry()
-breakHoursEntry.grid(column=2, row=2)
 workMinutesEntry = tk.Entry()
 workMinutesEntry.grid(column=4, row=1)
-breakMinutesEntry = tk.Entry()
-breakMinutesEntry.grid(column=4, row=2)
 workSecondsEntry = tk.Entry()
 workSecondsEntry.grid(column=6, row=1)
+breakHoursEntry = tk.Entry()
+breakHoursEntry.grid(column=2, row=2)
+breakMinutesEntry = tk.Entry()
+breakMinutesEntry.grid(column=4, row=2)
 breakSecondsEntry = tk.Entry()
 breakSecondsEntry.grid(column=6, row=2)
 # BUTTON
