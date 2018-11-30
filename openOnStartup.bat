@@ -1,6 +1,6 @@
 @echo off
-rem Batch file for running python pomodoro timer
-rem Place in shell:startup to start the program on startup on windows
+rem Batch file for running python pomodoro timer in the current directory
+rem Place in shell:startup with the program to start it on startup for windows
 set file=pythonPomodoroGUI.py
 echo Opening %file%
 python %file%
