@@ -9,42 +9,67 @@ Pomodoro timer created to require little user interaction
 and remove the need to have a browser open
 '''
 
-# Class for the display counter label
+#Initial HMS variables
+timeHours, timeMinutes, timeSeconds = 0, 0, 0
+# Initial number of displayCounter instances
+instances = 0
+
+# displayCounter Object
 class displayCounter():
-    # Initialize data for the class
     def __init__(self, window):
         self.window=window
         self.notifLabel = tk.Label(text="")
-        self.notifLabel.grid(column=0, row=4)
-        self.counter = workTime
+        self.notifLabel.grid(column=2, row=3)
+        self.workHours, self.workMinutes, self.workSeconds, self.breakHours, self.breakMinutes, self.breakSeconds = hmsdata
         self.isWorking = True
-        # Tuple for the initial display, [1] empty for compatibility
-        # with concatenation when reconfiguring notifLabel(text). I'm being lazy, I know.
-        self.data = ('Get to work!', '')
+        self.textNotifData = ('Get to work!', '')
+        global timeHours, timeMinutes, timeSeconds
+        timeHours, timeMinutes, timeSeconds = self.workHours, self.workMinutes, self.workSeconds
         self.tick()
 
-    #function called every second
+    # Called once per second
     def tick(self):
+        global timeHours, timeMinutes, timeSeconds
         try:
-            # If the countdown is running
-            if self.counter > 0:
-                # Set and display the counter string and decrement the counter
-                counterDisplayString = self.data[0] + " " + str(self.counter)
-                self.notifLabel.config(text=counterDisplayString)
-                self.counter -= 1
-            # Else if the counter is done
-            elif (self.counter <= 0):
-                # Get data tuple from time_up() function
-                self.data = self.time_up()
-                # Using the data indices which were set in time_up(),
-                # print the message, play the sound, set the counter, and set the isWorking boolean
-                #(Use SND_FILENAME to pause counter while playing the sound)
-                # # Sound options for different operating systems (only wav files are compatible with winsound)
-                    # os.system("aplay sound.wav&") # Linux
-                    # os.system("afplay sound.wav&") # Mac
-                winsound.PlaySound(self.data[1], winsound.SND_ASYNC) #windows
-                self.counter = self.data[2]
-                self.isWorking = self.data[3]
+            # if the countdown is running
+            if (timeHours >= 0 and timeMinutes >= 0 and timeSeconds >= 0):
+                # Set the HMS data to be displayed
+                self.timeDisplayData = str(timeHours) + ":" + str(timeMinutes) + ":" + str(timeSeconds)
+                # Set and display the data
+                notifString = self.textNotifData[0] + " " + str(self.timeDisplayData)
+                self.notifLabel.config(text=notifString)
+                # If the counter is done
+                if (timeHours == 0 and timeMinutes == 0 and timeSeconds == 0):
+                    # Get data tuple from time_up() function
+                    self.textNotifData = self.time_up()
+                    # Play sound asynchronously on windows
+                    try:
+                        winsound.PlaySound(self.textNotifData[1], winsound.SND_ASYNC)
+                    except Exception:
+                        # If error, try method for playing sound on linux
+                        try:
+                            os.system("aplay " + self.textNotifData[1] + ".wav&")
+                        except Exception:
+                            # If error, try method for playing sound on a Mac
+                            try:
+                                os.system("afplay " + self.textNotifData[1] + ".wav&")
+                            except Exception as e:
+                                print(e)
+                    self.isWorking = not self.isWorking
+                    if(self.isWorking):
+                        timeHours, timeMinutes, timeSeconds = self.workHours, self.workMinutes, self.workSeconds
+                    else:
+                        timeHours, timeMinutes, timeSeconds = self.breakHours, self.breakMinutes, self.breakSeconds
+                else:
+                    if(timeSeconds > 0):
+                        timeSeconds -= 1
+                    elif(timeMinutes > 0):
+                        timeMinutes -= 1
+                        timeSeconds = 59
+                    elif(timeHours > 0):
+                        timeHours -= 1
+                        timeMinutes = 59
+                        timeSeconds = 59
         # Print exception if it occurs
         except Exception as e: #ValueError:
             print(e)
@@ -53,34 +78,30 @@ class displayCounter():
 
     # Set the state according to the isWorking boolean
     def time_up(self):
+        self.workHours, self.workMinutes, self.workSeconds, self.breakHours, self.breakMinutes, self.breakSeconds = hmsdata
         # If the user is working
         if self.isWorking == True:
-            # Set tuple values for the break state
-            msg = 'Take a break!'
-            soundName = 'BreakSound'
-            counter = breakTime
+            return ('Take a break!', 'BreakSound')
         # Else, the user is not working
         else:
-            # Set tuples values for the work state
-            msg = 'Get back to work!'
-            soundName = 'WorkSound'
-            counter = workTime
-        # Invert the isWorking boolean to be sent back in the tuple
-        isWorking = not self.isWorking
-        # Create tuple containing the data to be returned and return it
-        returnData = (msg, soundName, counter, isWorking)
-        return returnData
+            return('Get to work!', 'workSound')
 
-# number of instances
-instances = 0
 # Function to instantiate the counter and allow the times to be set while limiting counter to 1 instance
 def instantiate_displayCounter():
-    global workTime
-    global breakTime
     global instances
-    # Set the work and break times according to input in the entry fields
-    workTime = int(workEntry.get())
-    breakTime = int(breakEntry.get())
+    global hmsdata
+    hmsdata = [workHoursEntry, workMinutesEntry, workSecondsEntry, breakHoursEntry, breakMinutesEntry, breakSecondsEntry]
+    for i, data in enumerate(hmsdata):
+        try:
+            hmsdata[i] = int(hmsdata[i].get())
+        except ValueError:
+            hmsdata[i] = 0
+        except Exception as e:
+            print(e)
+        if hmsdata[i] > 60:
+            print("Input " + str(hmsdata[i]) + " > 60; flooring.")
+            hmsdata[i] = 60
+    print("Input = " + str(hmsdata))
     # Only allow one instance of the counter
     if(instances == 0):
         d = displayCounter(window)
@@ -92,24 +113,43 @@ def instantiate_displayCounter():
 # SETUP WINDOW
 window = tk.Tk()
 window.title("Python Pomodoro")
-window.geometry("250x150")
+window.geometry("500x125")
 # LABEL
-label1 = tk.Label(text="Pomodoro", font=("Times New Roman", 20))
-label1.grid(column=0, row=0)
-workLabel = tk.Label(text="Work length")
-workLabel.grid(column=0, row=1)
-breakLabel = tk.Label(text="Break length")
-breakLabel.grid(column=0, row=2)
+headLabel = tk.Label(text="Pomodoro", font=("Times New Roman", 20))
+headLabel.grid(columnspan=7, row=0,)
+workTextLabel = tk.Label(text="Work length")
+workTextLabel.grid(column=0, row=1)
+breakTextLabel = tk.Label(text="Break length")
+breakTextLabel.grid(column=0, row=2)
+workHoursLabel = tk.Label(text="H")
+workHoursLabel.grid(column=1, row=1)
+breakHoursLabel = tk.Label(text="H")
+breakHoursLabel.grid(column=1, row=2)
+workMinutesLabel = tk.Label(text="M")
+workMinutesLabel.grid(column=3, row=1)
+breakMinutesLabel = tk.Label(text="M")
+breakMinutesLabel.grid(column=3, row=2)
+workSecondsLabel = tk.Label(text="S")
+workSecondsLabel.grid(column=5, row=1)
+breakSecondsLabel = tk.Label(text="S")
+breakSecondsLabel.grid(column=5, row=2)
 # ENTRY
-workEntry = tk.Entry()
-workEntry.grid(column=1, row=1)
-breakEntry = tk.Entry()
-breakEntry.grid(column=1, row=2)
+workHoursEntry = tk.Entry()
+workHoursEntry.grid(column=2, row=1)
+workMinutesEntry = tk.Entry()
+workMinutesEntry.grid(column=4, row=1)
+workSecondsEntry = tk.Entry()
+workSecondsEntry.grid(column=6, row=1)
+breakHoursEntry = tk.Entry()
+breakHoursEntry.grid(column=2, row=2)
+breakMinutesEntry = tk.Entry()
+breakMinutesEntry.grid(column=4, row=2)
+breakSecondsEntry = tk.Entry()
+breakSecondsEntry.grid(column=6, row=2)
 # BUTTON
 button1 = tk.Button(text="Start", font=("Times New Roman", 12), command=instantiate_displayCounter)
 button1.grid(column=0, row=3)
+# Use a class with this method to fix the error from python sending self
+#button1.bind('<Return>', instantiate_displayCounter)
 # MAINLOOP
-#d = displayCounter(window)
 window.mainloop()
-
-

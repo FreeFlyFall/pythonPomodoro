@@ -2,7 +2,6 @@
 
 Simple pomodoro timer that requires little user input.
 
-3 versions:
+2 versions:
 - Command line interface
-- Tkinter GUI with seconds input
-- Tkinter GUI with hours, minutes, & seconds inputs
+- Tkinter graphical user interface
