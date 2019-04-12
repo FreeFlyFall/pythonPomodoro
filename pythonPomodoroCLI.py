@@ -3,7 +3,7 @@ import time
 import os
 
 '''
-Pomodoro timer created to require little user interaction without the need for a browser
+Pomodoro timer created to require little user interaction and remove the need to have a browser open
 '''
 
 # -- FUNCTIONS -------
