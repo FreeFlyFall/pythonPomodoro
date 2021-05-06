@@ -118,7 +118,7 @@ class Timer():
         return int(time.time()-self.start_time)
     def is_next_second(self):
         value = self.elapsed() > self.current_second
-        self.__sync() # Sync after comparison so this only returns true once per second
+        self.current_second += self.elapsed() - self.current_second # Update internal time value
         return value
     def value(self):
         display_seconds = int((self.total_seconds - self.elapsed()) % 60)
@@ -129,9 +129,6 @@ class Timer():
         return f'{zero_pad_int(display_hours)}:{zero_pad_int(display_minutes)}:{zero_pad_int(display_seconds)}'
     def is_done(self):
         return self.elapsed() >= self.total_seconds
-    # Update the internal time value
-    def __sync(self):
-        self.current_second += self.elapsed() - self.current_second
 
 def play_sound(sound):
     try:
