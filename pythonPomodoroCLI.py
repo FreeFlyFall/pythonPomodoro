@@ -68,7 +68,7 @@ def set_times():
             # Return times and number of iterations
             return cycle_time(w), cycle_time(b), cycle_time(l), i
         # Print error and return to getting input
-        except Exception as e: #ValueError:
+        except Exception as e:
             print(e)
 
 # Search for times
@@ -77,30 +77,31 @@ def search_minutes(string):
 def search_hours(string):
     return re.search('(\d+)h',string)
 
+# Return time in minutes
 def cycle_time(string):
+    # Parse hours and minutes
     hours = search_hours(string)
     if hours:
         hours = hours.group().replace('h','')
     minutes = search_minutes(string)
     if minutes:
-        minutes = minutes.group().replace('m','')
-    # Return time 
+        minutes = minutes.group().replace('m','') 
+    # Return total minutes
     if hours and minutes:
         return int(hours)*60 + int(minutes)
     elif hours and not minutes:
         return int(hours)*60
     else:
         return int(minutes)
- 
+
 def start_timer(mins, iteration_type):
     seconds = int(mins) * 60
     timer = Timer(seconds)
-    current_second = 0
-    print(' '.join([timer.value(),iteration_type])) # Initial print of time
+    # Print time every second until the timer is finished
+    print(' '.join([timer.value(),iteration_type])) # Print initial time
     while not timer.is_done():
-        if timer.is_next_second(current_second): # When the second has changed since the last poll
-            current_second += timer.elapsed() - current_second # Add the passed time
-            print(' '.join([timer.value(),iteration_type]))
+        if timer.is_next_second(): # When the second has changed since the last poll
+            print(f'{timer.value()} {iteration_type}')
         time.sleep(0.1) # Polling rate to update countdown
     # Play a sound when the timer finishes 
     if iteration_type == 'work':
@@ -111,12 +112,16 @@ def start_timer(mins, iteration_type):
 class Timer():
     def __init__(self, seconds):
         self.start_time = time.time()
-        self.total_seconds = int(seconds)
+        self.total_seconds = int(seconds) # How many seconds to wait for
+        self.current_second = 0 # Store a second value to compare against time
     def elapsed(self):
         return int(time.time()-self.start_time)
-    def is_next_second(self, current_second):
-        return self.elapsed() > current_second
+    def is_next_second(self):
+        value = self.elapsed() > self.current_second
+        self.__sync()
+        return value
     def value(self):
+        self.__sync()
         display_seconds = int((self.total_seconds - self.elapsed()) % 60)
         display_minutes = int((self.total_seconds/60 - self.elapsed()/60) % 60)
         display_hours = int(self.total_seconds/60/60 - self.elapsed()/60/60)
@@ -125,6 +130,9 @@ class Timer():
         return f'{zero_pad_int(display_hours)}:{zero_pad_int(display_minutes)}:{zero_pad_int(display_seconds)}'
     def is_done(self):
         return self.elapsed() >= self.total_seconds
+    # Update the internal time value
+    def __sync(self):
+        self.current_second += self.elapsed() - self.current_second
 
 def play_sound(sound):
     try:
