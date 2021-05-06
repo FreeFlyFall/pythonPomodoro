@@ -118,10 +118,9 @@ class Timer():
         return int(time.time()-self.start_time)
     def is_next_second(self):
         value = self.elapsed() > self.current_second
-        self.__sync()
+        self.__sync() # Sync after comparison so this only returns true once per second
         return value
     def value(self):
-        self.__sync()
         display_seconds = int((self.total_seconds - self.elapsed()) % 60)
         display_minutes = int((self.total_seconds/60 - self.elapsed()/60) % 60)
         display_hours = int(self.total_seconds/60/60 - self.elapsed()/60/60)
